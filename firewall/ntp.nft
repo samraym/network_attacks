@@ -1,0 +1,46 @@
+#!/usr/sbin/nft -f
+flush ruleset
+
+table ip ntp_firewall {
+  
+  # —— Chaîne INPUT ——
+  chain input {
+    type filter hook input priority 0; policy drop;
+    
+    # Loopback
+    iif lo accept
+
+    #  Connexions invalides → drop
+    ct state invalid drop
+
+    #  Réponses aux connexions existantes (reponses SSH ou http)
+    ct state established,related accept
+
+    # accepter les connections entrantes sur SSH (22) ou NTP (123)
+    tcp dport {22,123} ct state new accept
+
+    #  Ping entrant
+    icmp type echo-request counter accept
+
+    # Tout le reste est dropé (policy drop)
+  }
+
+  # —— Chaîne FORWARD ——
+  chain forward {
+    type filter hook forward priority 0; policy drop;
+    # (pas de routage sur un serveur DMZ)
+  }
+
+  # —— Chaîne OUTPUT ——
+  chain output {
+    type filter hook output priority 0; policy drop;
+
+    # Pas de ping sortant
+    icmp type echo-request counter drop
+
+    # Réponses aux connexions autorisées
+    ct state established,related accept
+
+    # (tout nouveau output est dropé par policy)
+  }
+}
