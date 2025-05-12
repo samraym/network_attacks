@@ -20,16 +20,23 @@ table ip r2_filter {
     chain forward {
         type filter hook forward priority 0; policy drop;
 
+        # Existing connections
         ct state { established, related } accept
 
-        # DMZ -> Internet
+        # DMZ → Internet
         ip saddr $NET_DMZ ip daddr 0.0.0.0/0 accept
 
-        # Internet -> DMZ (réponses uniquement)
-        ip saddr 0.0.0.0/0 ip daddr $NET_DMZ ct state related, established accept
+        # WSs → Internet
+        ip saddr 10.1.0.0/24 ip daddr 0.0.0.0/0 accept
+
+        # Internet → DMZ (allow new connections too!)
+        ip saddr 10.2.0.0/24 ip daddr $NET_DMZ accept
+
+        # Internet → WSs: Not allowed (dropped by default)
     }
 
     chain output {
         type filter hook output priority 0; policy accept;
     }
 }
+
