@@ -1,0 +1,50 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+define NET_DMZ = 10.12.0.0/24
+define NET_WSS = 10.1.0.0/24
+define NET_WWW = 10.2.0.0/24  # Internet dans ta topologie
+
+table ip r2_filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+
+        # Connexions légitimes
+        ct state { established, related } accept
+        ct state invalid drop
+
+        # SSH admin vers R2 (optionnel)
+        tcp dport 22 accept
+
+        # Ping vers R2 autorisé
+        icmp type echo-request accept
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+
+        # Connexions déjà établies ou connexions associées (ex: FTP data)
+        ct state { established, related } accept
+
+        # DMZ → Internet
+        ip saddr 10.12.0.0/24 ip daddr 0.0.0.0/0 accept
+
+        # WSs → Internet
+        ip saddr 10.1.0.0/24 ip daddr 0.0.0.0/0 accept
+
+        # Internet → DMZ (autorise, mais protège contre les scans)
+        ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 tcp flags & (syn|ack) == syn limit rate 30/minute burst 3 accept
+        ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 udp dport 20-100 limit rate 30/minute burst 3 accept
+        ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 ct state related, established accept
+
+        # (Optionnel) bloque les pings venant d'Internet vers DMZ
+        ip saddr $NET_WWW ip daddr 10.12.0.0/24 ip protocol icmp drop
+
+        # Internet → WSs : bloqué par défaut (pas de règle = drop)
+    }
+
+    chain output {
+        type filter hook output priority 0; policy accept;
+    }
+}
