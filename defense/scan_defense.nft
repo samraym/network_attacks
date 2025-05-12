@@ -1,3 +1,5 @@
+
+
 #!/usr/sbin/nft -f
 
 flush ruleset
@@ -28,23 +30,23 @@ table ip r2_filter {
         ct state { established, related } accept
 
         # DMZ → Internet
-        ip saddr 10.12.0.0/24 ip daddr 0.0.0.0/0 accept
+        ip saddr $NET_DMZ ip daddr 0.0.0.0/0 accept
 
         # WSs → Internet
-        ip saddr 10.1.0.0/24 ip daddr 0.0.0.0/0 accept
+        ip saddr $NET_WSS ip daddr 0.0.0.0/0 accept
 
-        # Internet → DMZ (autorise, mais protège contre les scans)
-        ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 tcp flags & (syn|ack) == syn limit rate 30/minute burst 3 accept
-        ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 udp dport 20-100 limit rate 30/minute burst 3 accept
-        ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 ct state related, established accept
+        # Internet → DMZ (avec protection contre scans)
+        ip saddr $NET_WWW ip daddr $NET_DMZ tcp flags & (syn|ack) == syn limit rate 30/minute
+        ip saddr $NET_WWW ip daddr $NET_DMZ udp dport 20-100 limit rate 30/minute
+        ip saddr $NET_WWW ip daddr $NET_DMZ ct state related, established accept
 
-        # (Optionnel) bloque les pings venant d'Internet vers DMZ
-        ip saddr $NET_WWW ip daddr 10.12.0.0/24 ip protocol icmp drop
 
-        # Internet → WSs : bloqué par défaut (pas de règle = drop)
     }
 
     chain output {
         type filter hook output priority 0; policy accept;
     }
 }
+
+This paste expires in <1 hour. Public IP access. Share whatever you see with others in seconds with Context. Terms of ServiceReport this
+
