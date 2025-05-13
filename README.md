@@ -72,6 +72,23 @@ exemple :
 internet python3 ./attacks/networkscan.py 10.12.0.10 20 30
 ```
 
+### ARP Poisoning
+
+We implemented an ARP cache poisoning attack where **`ws2`** impersonates the router (`r1`) to the victim machine **`ws3`**. The script sends **spoofed ARP replies** to `ws3`, tricking it into associating the IP address of the gateway (`10.1.0.1`) with the MAC address of the attacker (`ws2`). As a result, all traffic from `ws3` destined to the gateway is mistakenly sent to `ws2`.
+
+To run the attack:
+```bash
+ws2 python3 ./attacks/arp_poison.py
+```
+To observe the effect:
+* Open a terminal in ws3
+Run:
+* ping 10.1.0.1  # router
+* ping 10.1.0.2  # attacker
+
+You will see that both IPs now resolve to the same MAC address, confirming that the ARP table has been poisoned.
+
+This validates the effectiveness of the attack and shows how `ws3` can intercept or redirect traffic intended for the router.
 ## defense 
 ### network scans
 The basic firewall configuration already provides good protection against **UDP port scans**. For **TCP port scans**, we implemented an additional firewall called `scan_defense.nft`.
