@@ -1,53 +1,72 @@
 # network_attacks - homework LINFO2347
-### basis enterprise network protection
+## basis enterprise network protection
 
-on utilise une politique de défense en profondeur (defense in depth).
-Configurer des pare-feux sur chaque composant de l’architecture réseau :  
-- Serveurs en **DMZ** (HTTP, FTP, DNS, NTP)
-- Routeur **R1** (accès Workstations)
-- Routeur **R2** (accès Internet)
+We apply a **defense-in-depth** strategy by configuring multiple layers of firewalls within the network. The following components are protected by custom firewall rules:
 
----
-
-## 🖥️ Structure du réseau
-
-| Composant | Rôle                         | Interface(s) concernée(s) |
-|-----------|------------------------------|----------------------------|
-| `http`    | Serveur web (port 80)        | DMZ                        |
-| `ftp`     | Serveur FTP/SSH(ports 21,22) | DMZ                        |
-| `dns`     | Serveur DNS (port 53)        | DMZ                        |
-| `ntp`     | Serveur NTP (port 123)       | DMZ                        |
-| `r1`      | Routeur vers WSs             | DMZ / WSs                  |
-| `r2`      | Routeur vers Internet        | DMZ / Internet             |
+* Servers in the **DMZ** (HTTP, FTP, DNS, NTP)
+* Router **R1** (access to Workstations)
+* Router **R2** (access to Internet)
 
 ---
 
-## 🔒 Règles générales appliquées
+### `r1.nft` – Firewall for Workstations 
 
-- Politique **DROP** par défaut (`policy drop`) sur tous les `input` et `forward`.
-- Acceptation uniquement des **flux nécessaires**.
-- **Anti-DOS** via limitation de requêtes (dans FTP par exemple).
-- Gestion des **connexions établies et connexes** (`ct state`).
+This firewall controls the incoming and outgoing traffic for the workstations (`10.1.0.0/24`).
 
----
+* The workstations can send **ping** and **initiate connections** towards the **DMZ servers** (`10.12.0.0/24`), the **Internet** (`10.2.0.0/24`) and other **workstations** (`10.1.0.0/24`)
+* Responses to these connections are allowed.
+* Unsolicited incoming connections to workstations are **blocked**.
+* **Ping (ICMP)** and **SSH (port 22)** are allowed for local administration.
 
-## 📂 Fichiers de configuration
 
-| Fichier     | Description                             |
-|-------------|-----------------------------------------|
-| `http.nft`  | Autorise uniquement ports 80, 22, ICMP  |
-| `ftp.nft`   | Autorise FTP avec limitation DoS   |
-| `dns.nft`   | Autorise port 53 (UDP/TCP)              |
-| `ntp.nft`   | Autorise port 123 + SSH/ICMP            |
-| `r1.nft`    | Contrôle accès WSs → DMZ/WWW            |
-| `r2.nft`    | Contrôle accès DMZ → Internet           |
+### `dns.nft, ftp.nft, http.nft, ntp.nft ` – Firewalls for DMZ servers
 
----
+those firewalls controls controls the incoming and outgoing traffic for the DMZ servers.
+the firewalls :
+* Allows responses to existing connections.
+* Blocks any outgoing connection, including ping.
+* Loopback traffic is allowed.
+* Applies default drop policies on all chains.
 
+### `r2.nft` – Firewall for internet
+This firewall controls the incoming and outgoing traffic for internet (`10.2.0.0/24`).
+
+* Allows connections initiated from the DMZ or Workstations to the Internet.
+* Allows the Internet to initiate connections only to the DMZ.
+* Blocks all incoming connections from the Internet to the Workstations.
+* Allows SSH and ping to R2.
+
+
+### execute every firewall on the VM
+
+We have modified the topo.py file to automatically deploy all firewall configurations once the topology is created.
+
+We added a custom function:
+```
+apply_firewalls(net: Mininet)
+```
+This function is called after the Mininet topology is initialized, and it applies all the firewall rules to the appropriate nodes.
+
+To launch the topology and apply firewalls:
+```
+sudo -E python3 topo.py
+```
+All .nft firewall scripts will be executed on the correct nodes directly from the Python script.
 
 ## attacks
 
 ### network scans
+
+
+
+
+
+
+
+---
+
+
+
 
 
 
