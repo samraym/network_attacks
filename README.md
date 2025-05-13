@@ -16,7 +16,7 @@ This firewall controls the incoming and outgoing traffic for the workstations (`
 * The workstations can send **ping** and **initiate connections** towards the **DMZ servers** (`10.12.0.0/24`), the **Internet** (`10.2.0.0/24`) and other **workstations** (`10.1.0.0/24`)
 * Responses to these connections are allowed.
 * Unsolicited incoming connections to workstations are **blocked**.
-* **Ping (ICMP)** and **SSH (port 22)** are allowed for local administration.
+*  Allows SSH and ping to R2.
 
 
 ### `dns.nft, ftp.nft, http.nft, ntp.nft ` – Firewalls for DMZ servers
@@ -73,7 +73,15 @@ internet python3 ./LINFO2347/attacks/networkscan.py
 
 ##defense 
 ### network scans
-he basic firewall configuration is already performant from UDP scan port. For TCP port scan we implented a firewall name scan_defense.nft. the firewall 
+The basic firewall configuration already provides good protection against **UDP port scans**. For **TCP port scans**, we implemented an additional firewall called `scan_defense.nft`.
+This firewall builds upon the rules from `r2.nft` and adds scan protection:
+* Limits TCP SYN packets from the Internet to the DMZ to 30 packets per minute
+* Limits UDP traffic from the Internet to DMZ to 30 packets per minute
+
+From within Mininet, run the following command to apply the firewall on R2:
+```bash
+r2 nft -f ./LINFO2347/defense/scan_defense.nft
+```
 
 
 
