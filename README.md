@@ -68,7 +68,7 @@ The attack is launched from the Internet node and targets both DMZ servers and w
 
 To launch the attack from Mininet, run:
 ```bash
-internet python3 ./LINFO2347/attacks/networkscan.py
+internet python3 ./attacks/networkscan.py
 ```
 
 ## defense 
@@ -80,7 +80,7 @@ This firewall builds upon the rules from `r2.nft` and adds scan protection:
 
 From within Mininet, run the following command to apply the firewall on R2:
 ```bash
-r2 nft -f ./LINFO2347/defense/scan_defense.nft
+r2 nft -f ./defense/scan_defense.nft
 ```
 
 
