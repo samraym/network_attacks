@@ -82,9 +82,11 @@ ws2 python3 ./attacks/arp_poison.py
 ```
 To observe the effect:
 * Open a terminal in ws3
+
 Run:
-* ping 10.1.0.1  # router
-* ping 10.1.0.2  # attacker
+* ping 10.1.0.1  (`r1`) 
+* ping 10.1.0.2  (`ws2`)
+* arp -n
 
 You will see that both IPs now resolve to the same MAC address, confirming that the ARP table has been poisoned.
 
