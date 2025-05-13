@@ -62,13 +62,14 @@ We have implemented a Python script name networkscan.py capable of performing a 
 - **TCP SYN port scan**
 - **UDP port scan**
 
-The attack is launched from the Internet node and targets both DMZ servers and workstations. The script checks whether a port is open or closed and writes the results to the file `scan_results.txt`.
-
-**Note:** The scan only targets the IPs `10.12.0.10`, `10.12.0.20`, `10.12.0.30`, `10.12.0.40`, `10.1.0.2`, and `10.1.0.3`, and ports ranging from **20 to 25**. The script could easily be extended to scan more ports or IPs, but this would take longer.
-
+The attack is launched from the Internet node and targets both DMZ servers and workstations. The script checks whether a port is open or closed and writes the results to the file `scan_results.txt`. The script allows you to choose the target IP address and specify the range of ports to scan, from a starting port to an ending port.
 To launch the attack from Mininet, run:
 ```bash
-internet python3 ./attacks/networkscan.py
+internet python3 ./attacks/networkscan.py IP_address start_port end_port
+```
+exemple :
+```bash
+internet python3 ./attacks/networkscan.py 10.12.0.10 20 30
 ```
 
 ## defense 
