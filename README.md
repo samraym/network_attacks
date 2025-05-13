@@ -48,7 +48,7 @@ apply_firewalls(net: Mininet)
 This function is called after the Mininet topology is initialized, and it applies all the firewall rules to the appropriate nodes.
 
 To launch the topology and apply firewalls:
-```
+```bash
 sudo -E python3 topo.py
 ```
 All .nft firewall scripts will be executed on the correct nodes directly from the Python script.
@@ -57,15 +57,23 @@ All .nft firewall scripts will be executed on the correct nodes directly from th
 
 ### network scans
 
+We have implemented a Python script name networkscan.py capable of performing a network scan in two different ways:
 
+- **TCP SYN port scan**
+- **UDP port scan**
 
+The attack is launched from the Internet node and targets both DMZ servers and workstations. The script checks whether a port is open or closed and writes the results to the file `scan_results.txt`.
 
+**Note:** The scan only targets the IPs `10.12.0.10`, `10.12.0.20`, `10.12.0.30`, `10.12.0.40`, `10.1.0.2`, and `10.1.0.3`, and ports ranging from **20 to 25**. The script could easily be extended to scan more ports or IPs, but this would take longer.
 
+To launch the attack from Mininet, run:
+```bash
+internet python3 ./LINFO2347/attacks/networkscan.py
+```
 
-
----
-
-
+##defense 
+### network scans
+he basic firewall configuration is already performant from UDP scan port. For TCP port scan we implented a firewall name scan_defense.nft. the firewall 
 
 
 
