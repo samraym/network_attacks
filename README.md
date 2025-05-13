@@ -71,7 +71,7 @@ To launch the attack from Mininet, run:
 internet python3 ./LINFO2347/attacks/networkscan.py
 ```
 
-##defense 
+## defense 
 ### network scans
 The basic firewall configuration already provides good protection against **UDP port scans**. For **TCP port scans**, we implemented an additional firewall called `scan_defense.nft`.
 This firewall builds upon the rules from `r2.nft` and adds scan protection:
