@@ -16,7 +16,7 @@ This firewall controls the incoming and outgoing traffic for the workstations (`
 * The workstations can send **ping** and **initiate connections** towards the **DMZ servers** (`10.12.0.0/24`), the **Internet** (`10.2.0.0/24`) and other **workstations** (`10.1.0.0/24`)
 * Responses to these connections are allowed.
 * Unsolicited incoming connections to workstations are **blocked**.
-*  Allows SSH and ping to R2.
+*  Allows SSH and ping to R1.
 
 
 ### `dns.nft, ftp.nft, http.nft, ntp.nft ` – Firewalls for DMZ servers
