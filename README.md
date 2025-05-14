@@ -94,7 +94,7 @@ You will see that both IPs now resolve to the same MAC address.
 
 To prepare the attack:
 
-* A user named victim is added on the FTP server with the weak password **lovely**:
+* A user named victim is added on the FTP server with the weak password **lovely**
 
 To create that user we ran on our VM:
 ```bash
