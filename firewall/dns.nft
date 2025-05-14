@@ -1,46 +1,37 @@
-#!/usr/sbin/nft -f
-flush ruleset
+
 
 table ip dns_firewall {
   
-  # —— Chaîne INPUT ——
   chain input {
     type filter hook input priority 0; policy drop;
     
-    # Loopback
+    # accepter les loops
     iif lo accept
 
-    #  Connexions invalides → drop
     ct state invalid drop
 
-    #  Réponses aux connexions existantes
+    # accepter les connexions établies
     ct state established,related accept
 
-    #  Nouvelles connexions ssh/dns vers le serveur
-    tcp dport {22,5353} ct state new accept
+    # puisque c'est la version vulnérable, elle accepte le traffic udp entrant
+    tcp dport 22 ct state new accept
+    udp dport 5353 ct state new accept
 
-    #  Ping entrant
     icmp type echo-request counter accept
-
-    # Tout le reste est dropé (policy drop)
   }
 
-  # —— Chaîne FORWARD ——
   chain forward {
     type filter hook forward priority 0; policy drop;
-    # (pas de routage sur un serveur DMZ)
   }
 
-  # —— Chaîne OUTPUT ——
   chain output {
     type filter hook output priority 0; policy drop;
 
-    # Pas de ping sortant
-    icmp type echo-request counter drop
+    # puisque c'est la version vulnérable, elle accepte le traffic udp entrant
+    udp sport 5353 counter accept
 
-    # Réponses aux connexions autorisées
+    # réponse au connexions établies
     ct state established,related accept
-
-    # (tout nouveau output est dropé par policy)
   }
 }
+

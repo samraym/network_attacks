@@ -1,6 +1,3 @@
-#!/usr/sbin/nft -f
-
-flush ruleset
 
 define NET_DMZ = 10.12.0.0/24
 
@@ -8,11 +5,10 @@ table ip r2_filter {
     chain input {
         type filter hook input priority 0; policy drop;
 
-        # Connexions légitimes
+        # accepter les connexions établies
         ct state { established, related } accept
         ct state invalid drop
 
-        # Admin SSH & Ping
         tcp dport 22 accept
         icmp type echo-request accept
     }
@@ -20,19 +16,19 @@ table ip r2_filter {
     chain forward {
         type filter hook forward priority 0; policy drop;
 
-        # Existing connections
+        # accepter les connexions établies
         ct state { established, related } accept
 
-        # DMZ → Internet
+        # DMZ → Internet 
         ip saddr $NET_DMZ ip daddr 0.0.0.0/0 accept
 
         # WSs → Internet
         ip saddr 10.1.0.0/24 ip daddr 0.0.0.0/0 accept
 
-        # Internet → DMZ (allow new connections too!)
+        # Internet → DMZ 
         ip saddr 10.2.0.0/24 ip daddr $NET_DMZ accept
 
-        # Internet → WSs: Not allowed (dropped by default)
+        # internet vers ws drop
     }
 
     chain output {

@@ -1,7 +1,4 @@
 
-
-#!/usr/sbin/nft -f
-
 flush ruleset
 
 define NET_DMZ = 10.12.0.0/24
@@ -48,5 +45,4 @@ table ip r2_filter {
     }
 }
 
-This paste expires in <1 hour. Public IP access. Share whatever you see with others in seconds with Context. Terms of ServiceReport this
 

@@ -108,7 +108,6 @@ def stop_services(net: Mininet) -> None:
 def apply_firewalls(net: Mininet) -> None:
     """
     Apply nftables firewall rules from .nft files after topology starts.
-    Assumes rules are already written for each server/router.
     """
     rules = {
         'http': 'http.nft',
@@ -121,8 +120,8 @@ def apply_firewalls(net: Mininet) -> None:
 
     for host, rule_file in rules.items():
         host_obj = net.get(host)
-        output = host_obj.cmd(f"nft -f /home/student-linfo2347/LINFO2347/firewall/{rule_file}")
-        print(f"[+] Applied {rule_file} on {host} →\n{output}")
+        host_obj.cmd(f"nft -f /home/student-linfo2347/LINFO2347/firewall/{rule_file}")
+        print(f"Applied {rule_file} on {host}")
 
 
 def run():
@@ -177,5 +176,5 @@ if __name__ == '__main__':
         # Deploy topology, open CLI
         run()
 
-# Example sam
+
 
