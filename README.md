@@ -72,7 +72,7 @@ exemple :
 internet python3 ./attacks/networkscan.py 10.12.0.10 20 30
 ```
 
-### 🧪 ARP Poisoning
+###  ARP Poisoning
 
 We implemented an ARP cache poisoning attack where **`ws2`** impersonates the router (`r1`) to the victim machine **`ws3`**. The script sends **spoofed ARP replies** to `ws3`, tricking it into associating the IP address of the gateway (`10.1.0.1`) with the MAC address of the attacker (`ws2`). As a result, all traffic from `ws3` destined to the gateway is sent to `ws2`.
 
@@ -92,7 +92,7 @@ You will see that both IPs now resolve to the same MAC address, confirming that 
 
 This validates the effectiveness of the attack and shows how `ws2` can intercept or redirect traffic intended for the router.
 
-### 🔐 FTP Brute-force Attack
+###  FTP Brute-force Attack
 
 The brute-force attack targets the FTP server (`10.12.0.40`) in the DMZ. The attack script systematically attempts to log in using a known weak username (`victim`) and a wordlist of common passwords (`10k-most-common.txt`).
 
@@ -183,7 +183,7 @@ ws3 arp -d <IP>
 ws3 python3 ./defense/arp_defense.py
 ```
 
-### 🛡️ FTP Brute-force Defense
+###  FTP Brute-force Defense
 
 To counter brute-force attempts from the Internet targeting the FTP server, we implemented a rate-limiting defense directly on r2, which acts as the gateway between the Internet and the internal network.
 
