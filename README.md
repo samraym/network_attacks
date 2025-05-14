@@ -57,7 +57,7 @@ All .nft firewall scripts will be executed on the correct nodes directly from th
 
 ### network scans
 
-We have implemented a Python script name networkscan.py capable of performing a network scan in two different ways:
+We have implemented a Python script named networkscan.py capable of performing a network scan in two different ways:
 
 - **TCP SYN port scan**
 - **UDP port scan**
