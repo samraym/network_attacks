@@ -224,7 +224,7 @@ Once the protection is set, the ssh brute force script won't work anymore. It wi
 
 ### Reflected DNS DoS defense
 
-To mitigate the reflected DNS DoS attack, we implemented a protection script to apply on `r1`, the router between the DMZ and the workstations. This script uses iptables to drop unsolicited UDP packets from the DNS server (`10.12.0.20`) to the workstations (`10.1.0.0/24`) on port **5353**, which is exploited in the attack.
+To mitigate the reflected DNS DoS attack, we implemented a protection script to apply on `r1`, the router between the DMZ and the workstations. This script uses iptables to drop unsolicited UDP packets from the DNS server (`10.12.0.20`) to the workstations (`10.1.0.0/24`) on port **5353** (`DNS`).
 
 The protection allows normal DNS traffic initiated by the workstations but blocks any spoofed DNS responses crafted to target a workstation like `ws3`. After applying this protection, re-running the attack results in 0 packets reaching `ws3`.
 
