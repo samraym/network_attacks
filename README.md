@@ -21,7 +21,7 @@ This firewall controls the incoming and outgoing traffic for the workstations (`
 
 ### `dns.nft, ftp.nft, http.nft, ntp.nft ` – Firewalls for DMZ servers
 
-those firewalls controls controls the incoming and outgoing traffic for the DMZ servers.
+those firewalls controls the incoming and outgoing traffic for the DMZ servers.
 the firewalls :
 * Allows responses to existing connections.
 * Blocks any outgoing connection, including ping.
@@ -74,7 +74,7 @@ internet python3 ./attacks/networkscan.py 10.12.0.10 20 30
 
 ###  ARP Poisoning
 
-We implemented an ARP cache poisoning attack where **`ws2`** impersonates the router (`r1`) to the victim machine **`ws3`**. The script sends **spoofed ARP replies** to `ws3`, tricking it into associating the IP address of the gateway (`10.1.0.1`) with the MAC address of the attacker (`ws2`). As a result, all traffic from `ws3` destined to the gateway is sent to `ws2`.
+For the ARP cache poisoning attack, **`ws2`** impersonates the router (`r1`) to the victim machine **`ws3`**. The attack is configured to work with `ws2` as the attacker, `r1` as the gateway and `ws3` as the victim. However, you can easily modify your target in the script by modifying the global variables **victim_ip** and **gateway_ip**. Our script sends **spoofed ARP replies** to `ws3`, tricking it into associating the IP address of the gateway (`10.1.0.1`) with the MAC address of the attacker (`ws2`). As a result, all traffic from `ws3` destined to the gateway is sent to `ws2`.
 
 To run the attack:
 ```bash
@@ -88,24 +88,22 @@ Run:
 * ping 10.1.0.2  (`ws2`)
 * arp -n
 
-You will see that both IPs now resolve to the same MAC address, confirming that the ARP table has been poisoned.
-
-This validates the effectiveness of the attack and shows how `ws2` can intercept or redirect traffic intended for the router.
+You will see that both IPs now resolve to the same MAC address.
 
 ###  FTP Brute-force Attack
 
-The brute-force attack targets the FTP server (`10.12.0.40`) in the DMZ because we know from network scanning that the port 21 is open. The attack script named ftp_bruteforce.py systematically attempts to log in using a known weak username (`victim`) and a wordlist of common passwords (`10k-most-common.txt`).
+The brute-force attack targets the FTP server (`10.12.0.40`) in the DMZ because we know from network scanning that the port 21 is open. The attack script named `ftp_bruteforce.py` systematically attempts to log in using a known weak username (`victim`) and a wordlist of common passwords (`10k-most-common.txt`).
 
 To prepare the attack:
 
-* A user named victim is added on the FTP server with the weak password lovely:
+* A user named victim is added on the FTP server with the weak password **lovely**:
 
 To create that user we ran on our VM:
 ```bash
 ftp adduser victim
 ```
 
-The attack is launched from the Internet node, simulating an external attacker traversing `r2` to reach the DMZ.
+The attack is launched from the **Internet** node, simulating an external attacker traversing `r2` to reach the DMZ.
 
 To run the attack:
 ```bash
@@ -113,9 +111,9 @@ internet python3 ./attacks/ftp_bruteforce.py
 ```
 The script will try all passwords in the wordlist until it successfully authenticates. For our example, successful login is printed as:
 
-* FOUND: victim:lovely
+* **FOUND: victim:lovely**
 
-It's then possible from internet to log into the FTP server. 
+It's then possible from internet to log into the FTP server using the found credentials. 
 ```bash
 ftp 10.12.0.40
 ```
@@ -123,13 +121,17 @@ ftp 10.12.0.40
 
 ### SSH Brute-force Attack
 
-Here, we decided to provide an alternative to the ftp bruteforce attack. It's a brute-force attack targeting the SSH service of the HTTP server (`10.12.0.10`) from the Internet node. The script named ssh_bruteforce.py iterates over the same wordlist as the FTP bruteforce (10k-most-common.txt) to guess the password of a specific user (victim). 
+Here, we decided to provide an alternative to the ftp bruteforce attack. It's a brute-force attack targeting the SSH service of the HTTP server (`10.12.0.10`) also launched from the **Internet**. The script named `ssh_bruteforce.py` iterates over the same wordlist as the FTP bruteforce (`10k-most-common.txt`) to guess the password of a specific user (`victim`). 
 
 To launch the attack:
 
 ```bash
 internet python3 ./attacks/ssh_bruteforce.py
 ```
+
+The script will try all passwords in the wordlist until it successfully authenticates. For our example, successful login is printed as:
+
+* **FOUND: victim:lovely**
 
 If successful, it allows the attacker to establish an SSH session using:
 
@@ -139,9 +141,9 @@ ssh victim@10.12.0.10
 
 ### Reflected DNS DoS Attack
 
-For this attack, we aimed to do a reflected Denial of Service where the DNS server in the DMZ is exploited to flood `ws3` with unsolicited responses. Since the Internet cannot directly reach the workstations due to firewall rules, the attacker spoofs the source IP address of the victim (`ws3`) and sends crafted DNS requests to the DNS server (`10.12.0.20`). These requests include various DNS record types (A, AAAA, MX, TXT, CNAME, etc.) to ensure variability and increase the processing load on the DNS server.
+For this attack, we aimed to do a reflected Denial of Service where the DNS server in the DMZ is exploited to flood `ws3` with unsolicited responses. Since the **Internet** cannot directly reach the workstations due to firewall rules, the attacker spoofs the source IP address of the victim (`ws3`) and sends crafted DNS requests to the DNS server (`10.12.0.20`). For the requests, we decided to use various DNS record types (A, AAAA, MX, TXT, CNAME, etc.) to increase the processing load on the DNS server.
 
-Each request appears to come from `ws3`, tricking the DNS server into sending all the replies back to `ws3`. This results in a high volume of traffic being redirected to the victim.
+Each request appears to come from `ws3`. The DNS server then thinks that it should send all the replies back to `ws3`. This results in a high volume of traffic being redirected to the victim (`ws3`).
 
 To launch the attack:
 ```bash
@@ -155,6 +157,8 @@ dns tcpdump -i dns-eth0 udp -n -vv
 ```
 
 You will see a stream of DNS packets generated by the attack and redirected to the workstation via the DNS server. 
+
+---
 
 ## Defense 
 ### network scans defense
@@ -170,7 +174,7 @@ r2 nft -f ./defense/scan_defense.nft
 
 ### ARP Poisoning defense
 
-To mitigate ARP spoofing attacks, we implemented a monitoring script named arp_defense.py that passively observes incoming ARP replies on the victim host (e.g. `ws3`). It detects suspicious changes in IP-to-MAC associations and flushes the corresponding ARP entry if a spoof is suspected.
+To mitigate ARP spoofing attacks, we implemented a monitoring script named `arp_defense.py` that passively observes incoming ARP replies on the victim host (in our case `ws3`). It detects suspicious changes in **IP-to-MAC** associations and flushes the corresponding ARP entry if a spoof is suspected.
 
 #### How to run the defense
 
@@ -183,15 +187,23 @@ ws3 arp -d <IP>
 ws3 python3 ./defense/arp_defense.py
 ```
 
+Once the ARP monitoring is in place, you can try to ping `10.1.0.1` from `ws3` and you'll notice that it doesn't appear in the ARP table and a waning message spotting the spoof will be displayed. 
+
+Example of warning message: 
+
+```bash
+ARP SPOOF DETECTED: 10.1.0.1 changed from c6:ee:e1:d6:df:fb to e6:b4:81:40:67:bf
+```
+
 ###  FTP Brute-force defense
 
-To counter brute-force attempts from the Internet targeting the FTP server, we implemented a rate-limiting defense directly on r2 named ftp_defense.py, which acts as the gateway between the Internet and the internal network.
+To counter brute-force attempts from the Internet targeting the FTP server, we implemented a rate-limiting defense directly on `r2` which acts as the gateway between the **Internet** and the internal topology.
 
 The script uses iptables to:
 
-* Track each new connection attempt from 10.2.0.2 (Internet) to any server in 10.12.0.0/24 on port 21 (FTP).
+* Track each new connection attempt from `10.2.0.2` (`Internet`) to any server in `10.12.0.0/24` on port `21` (FTP).
 
-* Drop traffic if more than 5 login attempts are detected in 60 seconds from the same IP.
+* Drop traffic if more than 5 login attempts are detected in 60 seconds from the same **IP**.
 
 To deploy the defense, execute:
 ```bash
@@ -202,7 +214,7 @@ When the defense is activated, the bruteforce attack will have a timeout on each
 
 ### SSH Bruteforce Defense
 
-To protect the DMZ servers from SSH brute-force attacks originating from the Internet, we implemented a defense script on the r2 gateway named ssh_protect.py. The script uses iptables to monitor and limit the number of SSH login attempts from a single IP address. If more than 5 attempts are detected within 60 seconds from the same IP, further SSH traffic from that source is dropped.
+To protect the DMZ servers from SSH brute-force attacks originating from the **Internet**, we implemented a defense script on the `r2` gateway named `ssh_protect.py`. Similarly to `ftp_defense.py`, the script uses iptables to monitor and limit the number of SSH login attempts from a single **IP** address. If more than 5 attempts are detected within 60 seconds from the same **IP**, the following SSH traffic from that source is dropped.
 
 To launch the defense mechanism:
 ```bash
@@ -213,11 +225,11 @@ Once the protection is set, the ssh brute force script won't work anymore. It wi
 
 ### Reflected DNS DoS defense
 
-To mitigate the reflected DNS DoS attack, we implemented a protection script named reflected_dos_protect.py on r1, the router between the DMZ and the workstations. This script uses iptables to drop unsolicited UDP packets from the DNS server (10.12.0.20) to the workstations (10.1.0.0/24) on port 5353, which is exploited in the attack.
+To mitigate the reflected DNS DoS attack, we implemented a protection script to apply on `r1`, the router between the DMZ and the workstations. This script uses iptables to drop unsolicited UDP packets from the DNS server (`10.12.0.20`) to the workstations (`10.1.0.0/24`) on port **5353**, which is exploited in the attack.
 
-The protection allows normal DNS traffic initiated by the workstations but blocks any spoofed DNS responses crafted to target a workstation like ws3. After applying this protection, re-running the attack results in 0 packets reaching ws3.
+The protection allows normal DNS traffic initiated by the workstations but blocks any spoofed DNS responses crafted to target a workstation like `ws3`. After applying this protection, re-running the attack results in 0 packets reaching `ws3`.
 
-To apply the defense, run the following command from the Mininet:
+To apply the defense, execute:
 
 ```bash
 r1 python3 ./defense/dns_reflected_defense.py
