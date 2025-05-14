@@ -140,7 +140,7 @@ ssh victim@10.12.0.10
 
 ### Reflected DNS DoS Attack
 
-For this attack, we aimed to do a reflected Denial of Service where the DNS server in the DMZ is exploited to flood `ws3` with unsolicited responses. Since the **Internet** cannot directly reach the workstations due to firewall rules, the attacker spoofs the source IP address of the victim (`ws3`) and sends crafted DNS requests to the DNS server (`10.12.0.20`). For the requests, we decided to use various DNS record types (A, AAAA, MX, TXT, CNAME, etc.) to increase the processing load on the DNS server.
+For this attack, we aimed to do a reflected Denial of Service where the DNS server is exploited to flood `ws3` with unsolicited responses. Since the **Internet** cannot directly reach the workstations due to firewall rules, the attacker spoofs the source IP address of the victim (`ws3`) and sends crafted DNS requests to the DNS server (`10.12.0.20`). For the requests, we decided to use various DNS record types (A, AAAA, MX, TXT, CNAME, etc.) to increase the processing load on the DNS server.
 
 Each request appears to come from `ws3`. The DNS server then thinks that it should send all the replies back to `ws3`. This results in a high volume of traffic being redirected to the victim (`ws3`).
 
@@ -217,7 +217,7 @@ To protect the DMZ servers from SSH brute-force attacks originating from the **I
 
 To launch the defense mechanism:
 ```bash
-r2 python3 ./defense/ssh_defense.py
+r2 python3 ./defense/ssh_protect.py
 ```
 
 Once the protection is set, the ssh brute force script won't work anymore. It will automatically be stopped after two passwords tries.
@@ -231,7 +231,7 @@ The protection allows normal DNS traffic initiated by the workstations but block
 To apply the defense, execute:
 
 ```bash
-r1 python3 ./defense/dns_reflected_defense.py
+r1 python3 ./defense/reflected_dos_protect.py
 ```
 
 
