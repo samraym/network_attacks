@@ -185,7 +185,7 @@ ws3 python3 ./defense/arp_defense.py
 
 ###  FTP Brute-force Defense
 
-To counter brute-force attempts from the Internet targeting the FTP server, we implemented a rate-limiting defense named ftp_defense.py directly on r2, which acts as the gateway between the Internet and the internal network.
+To counter brute-force attempts from the Internet targeting the FTP server, we implemented a rate-limiting defense directly on r2 named ftp_defense.py, which acts as the gateway between the Internet and the internal network.
 
 The script uses iptables to:
 
@@ -202,7 +202,7 @@ When the defense is activated, the bruteforce attack will have a timeout on each
 
 ### SSH Bruteforce Defense
 
-To protect the DMZ servers from SSH brute-force attacks originating from the Internet, we implemented a defense script named ssh_protect.py on the r2 gateway. The script uses iptables to monitor and limit the number of SSH login attempts from a single IP address. If more than 5 attempts are detected within 60 seconds from the same IP, further SSH traffic from that source is dropped.
+To protect the DMZ servers from SSH brute-force attacks originating from the Internet, we implemented a defense script on the r2 gateway named ssh_protect.py. The script uses iptables to monitor and limit the number of SSH login attempts from a single IP address. If more than 5 attempts are detected within 60 seconds from the same IP, further SSH traffic from that source is dropped.
 
 To launch the defense mechanism:
 ```bash
@@ -213,7 +213,7 @@ Once the protection is set, the ssh brute force script won't work anymore. It wi
 
 ### Defense: Reflected DNS DoS
 
-To mitigate the reflected DNS DoS attack, we implemented a protection script on r1 named , the router between the DMZ and the workstations. This script uses iptables to drop unsolicited UDP packets from the DNS server (10.12.0.20) to the workstations (10.1.0.0/24) on port 5353, which is exploited in the attack.
+To mitigate the reflected DNS DoS attack, we implemented a protection script named reflected_dos_protect.py on r1, the router between the DMZ and the workstations. This script uses iptables to drop unsolicited UDP packets from the DNS server (10.12.0.20) to the workstations (10.1.0.0/24) on port 5353, which is exploited in the attack.
 
 The protection allows normal DNS traffic initiated by the workstations but blocks any spoofed DNS responses crafted to target a workstation like ws3. After applying this protection, re-running the attack results in 0 packets reaching ws3.
 
