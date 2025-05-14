@@ -74,7 +74,7 @@ internet python3 ./attacks/networkscan.py 10.12.0.10 20 30
 
 ###  ARP Poisoning
 
-For the ARP cache poisoning attack, **`ws2`** impersonates the router (`r1`) to the victim machine **`ws3`**. The attack is configured to work with `ws2` as the attacker, `r1` as the gateway and `ws3` as the victim. However, you can easily modify your target in the script by modifying the global variables **victim_ip** and **gateway_ip**. Our script sends **spoofed ARP replies** to `ws3`, tricking it into associating the IP address of the gateway (`10.1.0.1`) with the MAC address of the attacker (`ws2`). As a result, all traffic from `ws3` destined to the gateway is sent to `ws2`.
+For the ARP cache poisoning attack, the attack is configured to work with `ws2` as the attacker, `r1` as the gateway and `ws3` as the victim. However, you can easily modify your target in the script by modifying the global variables **victim_ip** and **gateway_ip**. In our specific case, **`ws2`** impersonates the router (`r1`) to the victim machine **`ws3`**. Our script sends **spoofed ARP replies** to `ws3`, tricking it into associating the IP address of the gateway (`10.1.0.1`) with the MAC address of the attacker (`ws2`). As a result, all traffic from `ws3` destined to the gateway is sent to `ws2`.
 
 To run the attack:
 ```bash
