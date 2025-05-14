@@ -92,8 +92,6 @@ You will see that both IPs now resolve to the same MAC address.
 
 ###  FTP Brute-force Attack
 
-The brute-force attack targets the FTP server (`10.12.0.40`) in the DMZ because we know from network scanning that the port 21 is open. The attack script named `ftp_bruteforce.py` systematically attempts to log in using a known weak username (`victim`) and a wordlist of common passwords (`10k-most-common.txt`).
-
 To prepare the attack:
 
 * A user named victim is added on the FTP server with the weak password **lovely**:
@@ -103,17 +101,18 @@ To create that user we ran on our VM:
 ftp adduser victim
 ```
 
-The attack is launched from the **Internet** node, simulating an external attacker traversing `r2` to reach the DMZ.
+The brute-force attack targets the FTP server (`10.12.0.40`) in the DMZ because we know from network scanning that the port 21 is open. The attack script named `ftp_bruteforce.py` systematically attempts to log in using a known weak username (`victim`) and a wordlist of common passwords (`10k-most-common.txt`).
+
 
 To run the attack:
 ```bash
 internet python3 ./attacks/ftp_bruteforce.py
 ```
-The script will try all passwords in the wordlist until it successfully authenticates. For our example, successful login is printed as:
+The attack is launched from the **Internet** node, simulating an external attacker traversing `r2` to reach the DMZ. The script will try all passwords in the wordlist until it successfully authenticates. For our example, successful login is printed as:
 
 * **FOUND: victim:lovely**
 
-It's then possible from internet to log into the FTP server using the found credentials. 
+It's then possible from **Internet** to log into the FTP server using the found credentials. 
 ```bash
 ftp 10.12.0.40
 ```
