@@ -121,7 +121,7 @@ ftp 10.12.0.40
 ```
 
 
-### SSH Bruteforce Attack
+### SSH Brute-force Attack
 
 Here, we decided to provide an alternative to the ftp bruteforce attack. It's a brute-force attack targeting the SSH service of the HTTP server (`10.12.0.10`) from the Internet node. The script iterates over the same wordlist as the FTP bruteforce (10k-most-common.txt) to guess the password of a specific user (victim). 
 
