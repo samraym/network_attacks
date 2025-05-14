@@ -94,7 +94,7 @@ This validates the effectiveness of the attack and shows how `ws2` can intercept
 
 ###  FTP Brute-force Attack
 
-The brute-force attack targets the FTP server (`10.12.0.40`) in the DMZ because we know from network scanning that the port 21 is open. The attack script systematically attempts to log in using a known weak username (`victim`) and a wordlist of common passwords (`10k-most-common.txt`).
+The brute-force attack targets the FTP server (`10.12.0.40`) in the DMZ because we know from network scanning that the port 21 is open. The attack script named ftp_bruteforce.py systematically attempts to log in using a known weak username (`victim`) and a wordlist of common passwords (`10k-most-common.txt`).
 
 To prepare the attack:
 
@@ -123,7 +123,7 @@ ftp 10.12.0.40
 
 ### SSH Brute-force Attack
 
-Here, we decided to provide an alternative to the ftp bruteforce attack. It's a brute-force attack targeting the SSH service of the HTTP server (`10.12.0.10`) from the Internet node. The script iterates over the same wordlist as the FTP bruteforce (10k-most-common.txt) to guess the password of a specific user (victim). 
+Here, we decided to provide an alternative to the ftp bruteforce attack. It's a brute-force attack targeting the SSH service of the HTTP server (`10.12.0.10`) from the Internet node. The script named ssh_bruteforce.py iterates over the same wordlist as the FTP bruteforce (10k-most-common.txt) to guess the password of a specific user (victim). 
 
 To launch the attack:
 
